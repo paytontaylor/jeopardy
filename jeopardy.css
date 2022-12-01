@@ -1,0 +1,54 @@
+/* some colors you may find useful:
+  #115ff4
+  #060ce9
+  #28a200
+  #8d2ab5
+  #74119c
+*/
+body {
+    background-color: #115ff4;
+}
+
+#spin-container {
+    display: block;
+}
+
+#jeopary {
+    display: block;
+}
+
+#body:hover {
+    cursor: pointer;
+}
+
+header {
+    display: block;
+    text-align: center;
+}
+
+h1 {
+    color: white;
+}
+
+button {
+    background-color: #8d2ab5;
+    color: white;
+    padding: 10px 25px;
+    border-radius: 5px;
+    border: 0.5px solid grey;
+    margin-bottom: 20px;
+}
+
+#container {
+    display: flex;
+    justify-content: center;
+}
+
+td {
+    height: 100px;
+    width: 150px;
+    background-color: #060ce9;
+    color: white;
+    text-align: center;
+    border: 1px solid white;
+}
