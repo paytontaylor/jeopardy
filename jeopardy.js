@@ -18,18 +18,10 @@
 //    ...
 //  ]
 
-// let $body = $("#body");
-// for (let y = 0; y < height; y++) {
-//     let $bodyRow = $("<tr>");
-//     $body.append($bodyRow);
-//     for (let x = 0; x < width; x++) {
-//         $bodyRow.append(`<td>?</td>`);
-//     }
-// }
-
-let categories = [];
+let catIds = [];
 let width = 6;
 let height = 5;
+$('#start').on('click', setupAndStart);
 
 /** Get NUM_CATEGORIES random category from API.
  *
@@ -38,11 +30,8 @@ let height = 5;
 
 async function getCategoryIds() {
     const res = await axios.get("http://jservice.io/api/categories?count=100");
-    let NUM_CATEGORIES = _.sampleSize(res.data, [(n = 6)]);
-    for (let category of NUM_CATEGORIES) {
-        categories.push(category.id);
-    }
-    return categories;
+    let catIds = res.data.map(cat => cat.id);
+    return _.sampleSize(catIds, width);
 }
 
 /** Return object with data about a category:
@@ -60,10 +49,16 @@ async function getCategoryIds() {
 async function getCategory(catId) {
     const res = await axios.get(`http://jservice.io/api/category?id=${catId}`);
     let category_data = res.data;
+    let clues = category_data.clues.map(c => ({
+        question: c.question,
+        answer: c.answer,
+        showing: null,
+    }));
     return {
         title: category_data.title,
-        clues: category_data.clues,
+        clues
     };
+
 }
 
 /** Fill the HTML table#jeopardy with the categories & cells for questions.
@@ -74,21 +69,22 @@ async function getCategory(catId) {
  *   (initally, just show a "?" where the question/answer would go.)
  */
 
-let $head = $("#head");
-let $headRow = $("<tr>");
 
 async function fillTable() {
-    $head.append($headRow);
-    for (let category of categories) {
-        category = await getCategory(category);
-        $headRow.append(`<td>${category.title}</td>`);
+    let $head = $("#head");
+    let $headRow = $("<tr>");
+    $('#jeopardy #head').empty();
+    for (let catIdx = 0; catIdx < width; catIdx++) {
+        $headRow.append($("<th>").text(categories[catIdx].title));
     }
+    $head.append($headRow);
     let $body = $("#body");
+    $('#jeopardy #body').empty();
     for (let y = 0; y < height; y++) {
         let $bodyRow = $("<tr>");
         $body.append($bodyRow);
         for (let x = 0; x < width; x++) {
-            $bodyRow.append(`<td class='q-mark'>?</td>`);
+            $bodyRow.append($("<td>").attr("id", `${x}-${y}`).text("?"));
         }
     }
 }
@@ -101,33 +97,62 @@ async function fillTable() {
  * - if currently "answer", ignore click
  * */
 
-function handleClick(evt) {}
+$("#jeopardy").on("click", "td", handleClick);
+
+function handleClick(evt) {
+    let id = evt.target.id;
+    let [x, y] = id.split("-");
+    let clue = categories[x].clues[y];
+    let text;
+    if (!clue) {
+        console.log("Clue doesn't exist")
+    }
+
+    if (!clue.showing) {
+        text = clue.question
+        clue.showing = 'question'
+    }
+    else if (clue.showing === 'question') {
+        text = clue?.answer
+        clue.showing = 'answer'
+    }
+    else {
+        return
+    }
+    $(`#${x}-${y}`).text(text);
+}
 
 /** Wipe the current Jeopardy board, show the loading spinner,
  * and update the button used to fetch data.
  */
 
-function showLoadingView() {}
+function showLoadingView() { }
 
 /** Remove the loading spinner and update the button used to fetch data. */
 
-function hideLoadingView() {}
+function hideLoadingView() { }
 
 /** Start game:
  *
  * - get random category Ids
- * - get data for each category
+ * - get data for each catego
+ *]\
+ ]=]y
  * - create HTML table
  * */
 
-async function setupAndStart() {}
+async function setupAndStart() {
+    let catIds = await getCategoryIds();
+    categories = [];
+    for (let catId of catIds) {
+        categories.push(await getCategory(catId));
+    }
+    console.log(categories)
+    fillTable();
+};
 
 /** On click of start / restart button, set up game. */
 
 // TODO
 
 /** On page load, add event handler for clicking clues */
-
-function addClueEvent() {
-    $(".q-mark");
-}
