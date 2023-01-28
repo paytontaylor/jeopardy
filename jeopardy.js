@@ -29,7 +29,7 @@ $('#start').on('click', setupAndStart);
  */
 
 async function getCategoryIds() {
-    const res = await axios.get("http://jservice.io/api/categories?count=100");
+    const res = await axios.get("https://jservice.io/api/categories?count=100");
     let catIds = res.data.map(cat => cat.id);
     return _.sampleSize(catIds, width);
 }
