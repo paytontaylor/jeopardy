@@ -47,7 +47,7 @@ async function getCategoryIds() {
  */
 
 async function getCategory(catId) {
-    const res = await axios.get(`http://jservice.io/api/category?id=${catId}`);
+    const res = await axios.get(`https://jservice.io/api/category?id=${catId}`);
     let category_data = res.data;
     let clues = category_data.clues.map(c => ({
         question: c.question,
